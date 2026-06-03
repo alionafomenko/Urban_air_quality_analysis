@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="side-toolbar" aria-label="Головна навігація">
+            <div class="side-brand">
+                <span class="side-logo">ІС</span>
+                <div>
+                    <strong>Аналіз повітря</strong>
+                    <small>Міська система</small>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <a href="/">Панель аналізу</a>
+                <a class="active" href="/events">Журнал подій</a>
+                <a href="/directories">Довідники</a>
+            </nav>
+        </aside>
+
+        <main class="page">
+            <section class="page-heading">
+                <p class="eyebrow">Події системи</p>
+                <h1><%= pageTitle %></h1>
+                <p class="description dark">
+                    Журнал автоматично формує події на основі стану датчиків та останніх вимірювань якості повітря.
+                </p>
+            </section>
+
+            <% if (error) { %>
+                <div class="error-box"><%= error %></div>
+            <% } %>
+
+            <section class="event-summary" aria-label="Підсумок подій">
+                <article>
+                    <span>Усього подій</span>
+                    <strong><%= events.length %></strong>
+                </article>
+                <article>
+                    <span>Високе забруднення</span>
+                    <strong><%= events.filter((event) => event.event_type === "high_pollution").length %></strong>
+                </article>
+                <article>
+                    <span>Датчики без даних</span>
+                    <strong><%= events.filter((event) => event.event_type === "no_data").length %></strong>
+                </article>
+                <article>
+                    <span>Нормалізація стану</span>
+                    <strong><%= events.filter((event) => event.event_type === "normalization").length %></strong>
+                </article>
+                <article>
+                    <span>Аномальні вимірювання</span>
+                    <strong><%= events.filter((event) => event.event_type === "anomaly" || event.event_type === "local_pollution").length %></strong>
+                </article>
+            </section>
+
+            <section class="event-list" aria-label="Список подій">
+                <% if (events.length === 0) { %>
+                    <div class="empty-events">
+                        Наразі журнал подій порожній.
+                    </div>
+                <% } %>
+
+                <% events.forEach((event) => { %>
+                    <article class="event-card <%= event.severity %>">
+                        <div class="event-marker"></div>
+                        <div>
+                            <div class="event-head">
+                                <h2><%= event.title %></h2>
+                                <span><%= event.sensor_name %></span>
+                            </div>
+                            <p><%= event.message %></p>
+                            <time datetime="<%= event.created_at ? new Date(event.created_at).toISOString() : "" %>">
+                                <%= event.created_at ? new Date(event.created_at).toLocaleString("uk-UA") : "час не визначено" %>
+                            </time>
+                        </div>
+                    </article>
+                <% }) %>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
